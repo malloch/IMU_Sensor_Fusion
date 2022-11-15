@@ -1,8 +1,9 @@
-/**************************************************************************
+/***************************************************************************
  *                                                                         *
  * Sensor Fusion code for estimating orientation of Arduino-based IMU      *
  * 2022 Joseph Malloch, Brady Boettcher                                    *
- * Input Devices and Music Interaction Laboratory                          *
+ * Graphics and Experiential Media (GEM) Laboratory                        *
+ * Input Devices and Music Interaction Laboratory (IDMIL)                  *
  *                                                                         *
  ***************************************************************************
  *                                                                         *
@@ -18,6 +19,7 @@
 #include "imu_orientation.h"
 #include <cmath>
 
+#define DEGREE_TO_RAD (M_PI / 180.)
 #define GYRO_BIAS_COEFF 0.99999
 
 void IMU_Orientation::setAccelerometerValues(double x, double y, double z)
@@ -27,11 +29,21 @@ void IMU_Orientation::setAccelerometerValues(double x, double y, double z)
     accel.z = z;
 }
 
-void IMU_Orientation::setGyroscopeValues(double x, double y, double z)
+void IMU_Orientation::setGyroscopeRadianValues(double x, double y, double z, double period_sec)
 {
-    gyro.x = x;
-    gyro.y = y;
-    gyro.z = z;
+    // convert to delta radians before storing
+    gyro.x = x * period_sec;
+    gyro.y = y * period_sec;
+    gyro.z = z * period_sec;
+}
+
+void IMU_Orientation::setGyroscopeDegreeValues(double x, double y, double z, double period_sec)
+{
+    // convert to delta radians before storing
+    // x and y axes need to be inverted
+    gyro.x = x * DEGREE_TO_RAD * period_sec;
+    gyro.y = y * DEGREE_TO_RAD * period_sec;
+    gyro.z = z * DEGREE_TO_RAD * period_sec;
 }
 
 void IMU_Orientation::setMagnetometerValues(double x, double y, double z)
@@ -76,13 +88,6 @@ void IMU_Orientation::update(double weight)
     gyro.x -= gyro_bias.x;
     gyro.y -= gyro_bias.y;
     gyro.z -= gyro_bias.z;
-
-    // gyro should be converted to delta radians before storing
-    // step 1: convert from degrees/sec to radians/sec
-    // step 2: multiply value by elapsed time
-
-    // invert z-axis
-    gyro.z *= -1;
 
     // construct quaternion from gyroscope axes
     // z axis in inverted

@@ -1,9 +1,10 @@
-/**************************************************************************
+/***************************************************************************
  *                                                                         *
  * Sensor Fusion code for estimating orientation of an IMU                 *
  * 2022 Joseph Malloch, Brady Boettcher                                    *
  * Graphics and Experiential Media (GEM) Laboratory                        *
  * Input Devices and Music Interaction Laboratory (IDMIL)                  *
+ *                                                                         *
  ***************************************************************************
  *                                                                         *
  * This program is free software; you can redistribute it and/or modify    *
@@ -65,8 +66,9 @@ class IMU_Orientation {
     } Euler;
 
     void setAccelerometerValues(double x, double y, double z);
-    void setGyroscopeValues(double x, double y, double z);
     void setMagnetometerValues(double x, double y, double z);
+    void setGyroscopeDegreeValues(double x, double y, double z, double period);
+    void setGyroscopeRadianValues(double x, double y, double z, double period);
 
     void update(double weight = 0.99);
 
