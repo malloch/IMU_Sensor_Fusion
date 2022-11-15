@@ -69,7 +69,7 @@ void IMU_Orientation::update(double weight)
     double half_roll = atan2(accel.z, accel.y) * 0.5;
     Quaternion q_accel_roll(cos(half_roll), 0, sin(half_roll), 0);
     
-    double half_tilt = atan2(accel.x, accel.magnitude);
+    double half_tilt = atan2(accel.x, accel.magnitude) * 0.5;
     Quaternion q_accel_tilt(cos(half_tilt), sin(half_tilt), 0, 0);
 
     accel.magnitude = sqrt(pow(accel.x, 2) + pow(accel.magnitude, 2));
