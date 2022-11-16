@@ -21,7 +21,7 @@
 
 class IMU_Orientation {
   public:
-    IMU_Orientation() {}
+    IMU_Orientation(): quaternion(1,0,0,0) {}
     ~IMU_Orientation() {}
   
     // Data structures
@@ -70,7 +70,7 @@ class IMU_Orientation {
     void setGyroscopeDegreeValues(double x, double y, double z, double period);
     void setGyroscopeRadianValues(double x, double y, double z, double period);
 
-    void update(double weight = 0.99);
+    void update(double weight = 0.01);
 
     Quaternion quaternion;
     Euler euler;

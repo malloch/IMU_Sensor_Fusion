@@ -8,29 +8,44 @@ This code is currently adapted for the LSM9DS1 IMU but should be trivial to adap
 
 ~~~ C++
 #include "imu_orientation.h"
+#include <iostream>
+#include <chrono>
+#include <unistd.h>
 
-IMU_Orientation orientation;
+int main(int argc, char** argv)
+{
+    IMU_Orientation imu;
+    int count = 10;
+    auto then = std::chrono::steady_clock::now();
 
-// set raw data values read from IMU sensors
-orientation.setAccelerometerValues(accel_x, accel_y, accel_z);
-orientation.setMagnetometerValues(mag_x, mag_y, mag_z);
-orientation.setGyroscopeValues(gyro_x, gyro_y, gyro_z);
+    while (count--) {
+        usleep(1000);
 
-// update sensor fusion
-orientation.update();
+        auto now = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed = then - now;
+        then = now;
 
-// print the estimated quaternion
-std::cout << "Quaternion: "
-          << orientation.quaternion.w << ", "
-          << orientation.quaternion.x << ", "
-          << orientation.quaternion.y << ", "
-          << orientation.quaternion.z << std::endl;
+        imu.setAccelerometerValues(0, 1, 0);
+        imu.setGyroscopeRadianValues(0, 0, 0, elapsed.count());
+        imu.setMagnetometerValues(0, 1, 2);
 
-// print the estimated Euler angles
-std::cout << "Euler angles: "
-          << orientation.euler.tilt << ", "
-          << orientation.euler.roll << ", "
-          << orientation.euler.azimuth << ", "
-          << std::endl;
+        imu.update();
 
+        // print the estimated quaternion
+        std::cout << "Quaternion: "
+                  << imu.quaternion.w << ", "
+                  << imu.quaternion.x << ", "
+                  << imu.quaternion.y << ", "
+                  << imu.quaternion.z << std::endl;
+
+        // print the estimated Euler angles
+        std::cout << "Euler angles: "
+                  << imu.euler.tilt << ", "
+                  << imu.euler.roll << ", "
+                  << imu.euler.azimuth << ", "
+                  << std::endl;
+    }
+
+    return 0;
+}
 ~~~
