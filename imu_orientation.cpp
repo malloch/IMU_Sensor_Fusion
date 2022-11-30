@@ -33,18 +33,18 @@ void IMU_Orientation::setGyroscopeRadianValues(double x, double y, double z, dou
 {
     // convert to delta radians before storing
     // x and y axes need to be inverted
-    gyro.x = x * -period_sec;
+    gyro.x = x * period_sec;
     gyro.y = y * -period_sec;
-    gyro.z = z * period_sec;
+    gyro.z = z * -period_sec;
 }
 
 void IMU_Orientation::setGyroscopeDegreeValues(double x, double y, double z, double period_sec)
 {
     // convert to delta radians before storing
     // x and y axes need to be inverted
-    gyro.x = x * -DEGREE_TO_RAD * period_sec;
+    gyro.x = x * DEGREE_TO_RAD * period_sec;
     gyro.y = y * -DEGREE_TO_RAD * period_sec;
-    gyro.z = z * DEGREE_TO_RAD * period_sec;
+    gyro.z = z * -DEGREE_TO_RAD * period_sec;
 }
 
 void IMU_Orientation::setMagnetometerValues(double x, double y, double z)
@@ -143,7 +143,7 @@ void IMU_Orientation::update(double weight)
     // assuming magnetometer data has already been calibrated
 
     // build quaternions from polar representation of magnetometer data
-    half_roll = atan2(mag.z, mag.y) * -0.5;
+    half_roll = atan2(mag.z, mag.y) * 0.5;
     Quaternion q_mag_roll(cos(half_roll), 0, sin(half_roll), 0);
 
     mag.magnitude = sqrt(pow(mag.z, 2) + pow(mag.y, 2));
