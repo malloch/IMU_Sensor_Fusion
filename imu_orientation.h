@@ -20,12 +20,22 @@
 #define IMU_ORIENTATION_H
 
 // Add definitions of M_PI just in case
-#ifndef M_PI
-    #define M_PI        3.14159265358979323846
+// Define float versions of M_PI and M_PI_2
+
+#ifdef M_PI
+    #define M_PIF        float(M_PI)
+#else
+    #define M_PIF        3.14159265358979323846f
 #endif
-#ifndef M_PI_2
-    #define M_PI_2      1.57079632679489661923
+#ifdef M_PI_2
+    #define M_PI_2F      float(M_PI_2)
+#else
+    #define M_PI_2F      1.57079632679489661923f
 #endif
+
+
+
+
 
 class IMU_Orientation {
   public:
@@ -78,7 +88,7 @@ class IMU_Orientation {
     void setGyroscopeDegreeValues(float x, float y, float z, float period);
     void setGyroscopeRadianValues(float x, float y, float z, float period);
 
-    void update(float weight = 0.01);
+    void update(float weight = 0.01f);
 
     Quaternion quaternion;
     Euler euler;

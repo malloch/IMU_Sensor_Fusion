@@ -19,7 +19,7 @@
 #include "imu_orientation.h"
 #include <cmath>
 
-#define DEGREE_TO_RAD (float(M_PI) / 180.f)
+#define DEGREE_TO_RAD (M_PIF / 180.f)
 #define GYRO_BIAS_COEFF 0.99999f
 
 void IMU_Orientation::setAccelerometerValues(float x, float y, float z)
@@ -67,10 +67,10 @@ void IMU_Orientation::update(float weight)
     // build quaternions from polar representation of accelerometer data
     accel.magnitude = sqrtf(powf(accel.z, 2) + powf(accel.y, 2));
 
-    float half_roll = atan2f(accel.z, accel.y) * 0.5;
+    float half_roll = atan2f(accel.z, accel.y) * 0.5f;
     Quaternion q_accel_roll(cosf(half_roll), 0, sinf(half_roll), 0);
     
-    float half_tilt = atan2(accel.x, accel.magnitude) * 0.5;
+    float half_tilt = atan2f(accel.x, accel.magnitude) * 0.5f;
     Quaternion q_accel_tilt(cosf(half_tilt), sinf(half_tilt), 0, 0);
 
     accel.magnitude = sqrtf(powf(accel.x, 2) + powf(accel.magnitude, 2));
@@ -91,12 +91,25 @@ void IMU_Orientation::update(float weight)
     gyro.z -= gyro_bias.z;
 
     // construct quaternion from gyroscope axes
-    Quaternion q_gyro(cosf((gyro.x + gyro.y + gyro.z) * 0.5), sinf(gyro.z * 0.5),
-                      sinf(gyro.x * 0.5), sinf(gyro.y * 0.5));
+    Quaternion q_gyro(cosf((gyro.x + gyro.y + gyro.z) * 0.5f), sinf(gyro.z * 0.5f),
+                      sinf(gyro.x * 0.5f), sinf(gyro.y * 0.5f));
 
     // integrate latest gyro quaternion with previous orientation
     quaternion = quaternion * q_gyro;
 
+    // calculate inverse quaternion for tilt estimate
+    half_tilt = euler.tilt * 0.5f;
+    // TODO: optimize by building inverse quaternion directly
+    Quaternion q_tilt_inv(cosf(half_tilt), sinf(half_tilt), 0, 0);
+    q_tilt_inv = q_tilt_inv.inverse();
+
+    // calculate inverse quaternion for roll estimate
+    half_roll = euler.roll * 0.5f;
+    // TODO: optimize by building inverse quaternion directly
+    Quaternion q_roll_inv(cosf(half_roll), 0, sinf(half_roll), 0);
+    q_roll_inv = q_roll_inv.inverse();
+
+    // Compute euler angles
     /* extract tilt and azimuth by rotating vector [0,1,0]: Q * [0,0,1,0] * Q^-1
      * before optimization:
         Quaternion right(0,0,1,0);
@@ -110,7 +123,7 @@ void IMU_Orientation::update(float weight)
     c_temp.y = quaternion.w * quaternion.w - quaternion.x * quaternion.x + quaternion.y * quaternion.y - quaternion.z * quaternion.z;
     c_temp.z = 2 * (quaternion.w * quaternion.x + quaternion.y * quaternion.z);
     euler.azimuth = atan2f(c_temp.x, c_temp.y);
-    euler.tilt = c_temp.z * M_PI_2;
+    euler.tilt = c_temp.z * M_PI_2F;
 
     /* extract roll by rotating vector [0,0,1]: Q * [0,0,0,1] * Q^-1
      * before optimization:
@@ -124,18 +137,6 @@ void IMU_Orientation::update(float weight)
     c_temp.z = quaternion.w * quaternion.w - quaternion.x * quaternion.x - quaternion.y * quaternion.y + quaternion.z * quaternion.z;
     euler.roll = atan2f(cosf(euler.azimuth) * c_temp.x + sinf(euler.azimuth) * -c_temp.y, c_temp.z);
 
-    // calculate inverse quaternion for tilt estimate
-    half_tilt = euler.tilt * 0.5;
-    // TODO: optimize by building inverse quaternion directly
-    Quaternion q_tilt_inv(cosf(half_tilt), sinf(half_tilt), 0, 0);
-    q_tilt_inv = q_tilt_inv.inverse();
-
-    // calculate inverse quaternion for roll estimate
-    half_roll = euler.roll * 0.5;
-    // TODO: optimize by building inverse quaternion directly
-    Quaternion q_roll_inv(cosf(half_roll), 0, sinf(half_roll), 0);
-    q_roll_inv = q_roll_inv.inverse();
-
     /**********************/
     /* MAGNETOMETER DATA  */
     /**********************/
@@ -143,11 +144,11 @@ void IMU_Orientation::update(float weight)
     // assuming magnetometer data has already been calibrated
 
     // build quaternions from polar representation of magnetometer data
-    half_roll = atan2f(mag.z, mag.y) * 0.5;
+    half_roll = atan2f(mag.z, mag.y) * 0.5f;
     Quaternion q_mag_roll(cosf(half_roll), 0, sinf(half_roll), 0);
 
     mag.magnitude = sqrtf(powf(mag.z, 2) + powf(mag.y, 2));
-    half_tilt = atan2f(mag.x, mag.magnitude) * 0.5;
+    half_tilt = atan2f(mag.x, mag.magnitude) * 0.5f;
     
     Quaternion q_mag_tilt(cosf(half_tilt), sinf(half_tilt), 0, 0);
     Quaternion q_mag = q_mag_tilt * q_mag_roll;
@@ -214,7 +215,7 @@ IMU_Orientation::Quaternion IMU_Orientation::Quaternion::slerp(Quaternion &q, fl
 {
     Quaternion o;
     float dot = dotProduct(q);
-    if (dot > 0.9995) {
+    if (dot > 0.9995f) {
         o.w = w + (q.w - w) * weight;
         o.x = x + (q.x - x) * weight;
         o.y = y + (q.y - y) * weight;
@@ -229,7 +230,7 @@ IMU_Orientation::Quaternion IMU_Orientation::Quaternion::slerp(Quaternion &q, fl
         dot = -1;
 
     float theta_0 = acosf(dot);
-    float theta = (0. < theta_0 && theta_0 < M_PI_2) ? theta_0 * weight : (theta_0 - M_PI) * weight;
+    float theta = (0.f < theta_0 && theta_0 < M_PI_2F) ? theta_0 * weight : (theta_0 - M_PIF) * weight;
 
     o.w = q.w - w * dot;
     o.x = q.x - x * dot;
@@ -266,9 +267,9 @@ void IMU_Orientation::Quaternion::minimizeDistance(Quaternion &old)
 {
     // use the shortest distance
     if (dotProduct(old) < 0) {
-        w *= -1.0;
-        x *= -1.0;
-        y *= -1.0;
-        z *= -1.0;
+        w *= -1.0f;
+        x *= -1.0f;
+        y *= -1.0f;
+        z *= -1.0f;
     }
 }
