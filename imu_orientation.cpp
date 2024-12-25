@@ -19,17 +19,17 @@
 #include "imu_orientation.h"
 #include <cmath>
 
-#define DEGREE_TO_RAD (M_PI / 180.)
-#define GYRO_BIAS_COEFF 0.99999
+#define DEGREE_TO_RAD (float(M_PI) / 180.f)
+#define GYRO_BIAS_COEFF 0.99999f
 
-void IMU_Orientation::setAccelerometerValues(double x, double y, double z)
+void IMU_Orientation::setAccelerometerValues(float x, float y, float z)
 {
     accel.x = x;
     accel.y = y;
     accel.z = z;
 }
 
-void IMU_Orientation::setGyroscopeRadianValues(double x, double y, double z, double period_sec)
+void IMU_Orientation::setGyroscopeRadianValues(float x, float y, float z, float period_sec)
 {
     // convert to delta radians before storing
     // x and y axes need to be inverted
@@ -38,7 +38,7 @@ void IMU_Orientation::setGyroscopeRadianValues(double x, double y, double z, dou
     gyro.z = z * -period_sec;
 }
 
-void IMU_Orientation::setGyroscopeDegreeValues(double x, double y, double z, double period_sec)
+void IMU_Orientation::setGyroscopeDegreeValues(float x, float y, float z, float period_sec)
 {
     // convert to delta radians before storing
     // x and y axes need to be inverted
@@ -47,14 +47,14 @@ void IMU_Orientation::setGyroscopeDegreeValues(double x, double y, double z, dou
     gyro.z = z * -DEGREE_TO_RAD * period_sec;
 }
 
-void IMU_Orientation::setMagnetometerValues(double x, double y, double z)
+void IMU_Orientation::setMagnetometerValues(float x, float y, float z)
 {
     mag.x = x;
     mag.y = y;
     mag.z = z;
 }
 
-void IMU_Orientation::update(double weight)
+void IMU_Orientation::update(float weight)
 {
     Quaternion q_temp;
     // Euler etemp;
@@ -65,15 +65,15 @@ void IMU_Orientation::update(double weight)
     /**********************/
 
     // build quaternions from polar representation of accelerometer data
-    accel.magnitude = sqrt(pow(accel.z, 2) + pow(accel.y, 2));
+    accel.magnitude = sqrtf(powf(accel.z, 2) + powf(accel.y, 2));
 
-    double half_roll = atan2(accel.z, accel.y) * 0.5;
-    Quaternion q_accel_roll(cos(half_roll), 0, sin(half_roll), 0);
+    float half_roll = atan2f(accel.z, accel.y) * 0.5;
+    Quaternion q_accel_roll(cosf(half_roll), 0, sinf(half_roll), 0);
     
-    double half_tilt = atan2(accel.x, accel.magnitude) * 0.5;
-    Quaternion q_accel_tilt(cos(half_tilt), sin(half_tilt), 0, 0);
+    float half_tilt = atan2(accel.x, accel.magnitude) * 0.5;
+    Quaternion q_accel_tilt(cosf(half_tilt), sinf(half_tilt), 0, 0);
 
-    accel.magnitude = sqrt(pow(accel.x, 2) + pow(accel.magnitude, 2));
+    accel.magnitude = sqrtf(powf(accel.x, 2) + powf(accel.magnitude, 2));
 
     Quaternion q_accel = q_accel_tilt * q_accel_roll;
 
@@ -82,17 +82,17 @@ void IMU_Orientation::update(double weight)
     /**********************/
 
     // continuously adjust for changing gyro bias
-    gyro_bias.x = gyro_bias.x * GYRO_BIAS_COEFF + gyro.x * (1.0 - GYRO_BIAS_COEFF);
-    gyro_bias.y = gyro_bias.y * GYRO_BIAS_COEFF + gyro.x * (1.0 - GYRO_BIAS_COEFF);
-    gyro_bias.z = gyro_bias.z * GYRO_BIAS_COEFF + gyro.x * (1.0 - GYRO_BIAS_COEFF);
+    gyro_bias.x = gyro_bias.x * GYRO_BIAS_COEFF + gyro.x * (1.0f - GYRO_BIAS_COEFF);
+    gyro_bias.y = gyro_bias.y * GYRO_BIAS_COEFF + gyro.x * (1.0f - GYRO_BIAS_COEFF);
+    gyro_bias.z = gyro_bias.z * GYRO_BIAS_COEFF + gyro.x * (1.0f - GYRO_BIAS_COEFF);
 
     gyro.x -= gyro_bias.x;
     gyro.y -= gyro_bias.y;
     gyro.z -= gyro_bias.z;
 
     // construct quaternion from gyroscope axes
-    Quaternion q_gyro(cos((gyro.x + gyro.y + gyro.z) * 0.5), sin(gyro.z * 0.5),
-                      sin(gyro.x * 0.5), sin(gyro.y * 0.5));
+    Quaternion q_gyro(cosf((gyro.x + gyro.y + gyro.z) * 0.5), sinf(gyro.z * 0.5),
+                      sinf(gyro.x * 0.5), sinf(gyro.y * 0.5));
 
     // integrate latest gyro quaternion with previous orientation
     quaternion = quaternion * q_gyro;
@@ -109,7 +109,7 @@ void IMU_Orientation::update(double weight)
     c_temp.x = 2 * (quaternion.x * quaternion.y - quaternion.w * quaternion.z);
     c_temp.y = quaternion.w * quaternion.w - quaternion.x * quaternion.x + quaternion.y * quaternion.y - quaternion.z * quaternion.z;
     c_temp.z = 2 * (quaternion.w * quaternion.x + quaternion.y * quaternion.z);
-    euler.azimuth = atan2(c_temp.x, c_temp.y);
+    euler.azimuth = atan2f(c_temp.x, c_temp.y);
     euler.tilt = c_temp.z * M_PI_2;
 
     /* extract roll by rotating vector [0,0,1]: Q * [0,0,0,1] * Q^-1
@@ -122,18 +122,18 @@ void IMU_Orientation::update(double weight)
     c_temp.x = 2 * (quaternion.x * quaternion.z + quaternion.w * quaternion.y);
     c_temp.y = 2 * (quaternion.y * quaternion.z - quaternion.w * quaternion.x);
     c_temp.z = quaternion.w * quaternion.w - quaternion.x * quaternion.x - quaternion.y * quaternion.y + quaternion.z * quaternion.z;
-    euler.roll = atan2(cos(euler.azimuth) * c_temp.x + sin(euler.azimuth) * -c_temp.y, c_temp.z);
+    euler.roll = atan2f(cosf(euler.azimuth) * c_temp.x + sinf(euler.azimuth) * -c_temp.y, c_temp.z);
 
     // calculate inverse quaternion for tilt estimate
     half_tilt = euler.tilt * 0.5;
     // TODO: optimize by building inverse quaternion directly
-    Quaternion q_tilt_inv(cos(half_tilt), sin(half_tilt), 0, 0);
+    Quaternion q_tilt_inv(cosf(half_tilt), sinf(half_tilt), 0, 0);
     q_tilt_inv = q_tilt_inv.inverse();
 
     // calculate inverse quaternion for roll estimate
     half_roll = euler.roll * 0.5;
     // TODO: optimize by building inverse quaternion directly
-    Quaternion q_roll_inv(cos(half_roll), 0, sin(half_roll), 0);
+    Quaternion q_roll_inv(cosf(half_roll), 0, sinf(half_roll), 0);
     q_roll_inv = q_roll_inv.inverse();
 
     /**********************/
@@ -143,13 +143,13 @@ void IMU_Orientation::update(double weight)
     // assuming magnetometer data has already been calibrated
 
     // build quaternions from polar representation of magnetometer data
-    half_roll = atan2(mag.z, mag.y) * 0.5;
-    Quaternion q_mag_roll(cos(half_roll), 0, sin(half_roll), 0);
+    half_roll = atan2f(mag.z, mag.y) * 0.5;
+    Quaternion q_mag_roll(cosf(half_roll), 0, sinf(half_roll), 0);
 
-    mag.magnitude = sqrt(pow(mag.z, 2) + pow(mag.y, 2));
-    half_tilt = atan2(mag.x, mag.magnitude) * 0.5;
+    mag.magnitude = sqrtf(powf(mag.z, 2) + powf(mag.y, 2));
+    half_tilt = atan2f(mag.x, mag.magnitude) * 0.5;
     
-    Quaternion q_mag_tilt(cos(half_tilt), sin(half_tilt), 0, 0);
+    Quaternion q_mag_tilt(cosf(half_tilt), sinf(half_tilt), 0, 0);
     Quaternion q_mag = q_mag_tilt * q_mag_roll;
 
     // rotate the magnetometer quaternion
@@ -161,16 +161,16 @@ void IMU_Orientation::update(double weight)
         conj = q_mag.conjugate();
         temp = up * conj;
         temp = q_mag * temp;
-        double half_azimuth = atan2(temp.x, temp.y) * 0.5;
+        float half_azimuth = atan2(temp.x, temp.y) * 0.5;
      */
     c_temp.x = 2 * (q_mag.x * q_mag.z + q_mag.w * q_mag.y);
     c_temp.y = 2 * (q_mag.y * q_mag.z - q_mag.w * q_mag.x);
-    double half_azimuth = atan2(c_temp.x, c_temp.y) * 0.5;
+    float half_azimuth = atan2f(c_temp.x, c_temp.y) * 0.5f;
 
     // replace q_mag with just azimuth
-    q_mag.w = cos(half_azimuth);
+    q_mag.w = cosf(half_azimuth);
     q_mag.x = q_mag.y = 0;
-    q_mag.z = sin(half_azimuth);
+    q_mag.z = sinf(half_azimuth);
 
     // construct quaternion from combined accelerometer and magnetometer azimuth data
     Quaternion q_accel_mag = q_mag * q_accel;
@@ -197,7 +197,7 @@ IMU_Orientation::Quaternion IMU_Orientation::Quaternion::inverse()
 {
     Quaternion o;
     float norm_squared = w * w + x * x + y * y + z * z;
-    if (norm_squared == 0) norm_squared = 0.0000001;
+    if (norm_squared == 0) norm_squared = 0.0000001f;
     o.w = w / norm_squared;
     o.x = x * -1 / norm_squared;
     o.y = y * -1 / norm_squared;
@@ -210,10 +210,10 @@ IMU_Orientation::Quaternion IMU_Orientation::Quaternion::conjugate()
     return Quaternion(w, -x, -y, -z);
 }
 
-IMU_Orientation::Quaternion IMU_Orientation::Quaternion::slerp(Quaternion &q, double weight)
+IMU_Orientation::Quaternion IMU_Orientation::Quaternion::slerp(Quaternion &q, float weight)
 {
     Quaternion o;
-    double dot = dotProduct(q);
+    float dot = dotProduct(q);
     if (dot > 0.9995) {
         o.w = w + (q.w - w) * weight;
         o.x = x + (q.x - x) * weight;
@@ -228,8 +228,8 @@ IMU_Orientation::Quaternion IMU_Orientation::Quaternion::slerp(Quaternion &q, do
     else if (dot < -1)
         dot = -1;
 
-    double theta_0 = acos(dot);
-    double theta = (0. < theta_0 && theta_0 < M_PI_2) ? theta_0 * weight : (theta_0 - M_PI) * weight;
+    float theta_0 = acosf(dot);
+    float theta = (0. < theta_0 && theta_0 < M_PI_2) ? theta_0 * weight : (theta_0 - M_PI) * weight;
 
     o.w = q.w - w * dot;
     o.x = q.x - x * dot;
@@ -237,25 +237,25 @@ IMU_Orientation::Quaternion IMU_Orientation::Quaternion::slerp(Quaternion &q, do
     o.z = q.z - z * dot;
     o.normalize();
 
-    o.w = w * cos(theta) + o.w * sin(theta);
-    o.x = x * cos(theta) + o.x * sin(theta);
-    o.y = y * cos(theta) + o.y * sin(theta);
-    o.z = z * cos(theta) + o.z * sin(theta);
+    o.w = w * cosf(theta) + o.w * sinf(theta);
+    o.x = x * cosf(theta) + o.x * sinf(theta);
+    o.y = y * cosf(theta) + o.y * sinf(theta);
+    o.z = z * cosf(theta) + o.z * sinf(theta);
     o.normalize();
     return o;
 }
 
-double IMU_Orientation::Quaternion::dotProduct(Quaternion &q)
+float IMU_Orientation::Quaternion::dotProduct(Quaternion &q)
 {
     return w * q.w + x * q.x + y * q.y + z * q.z;
 }
 
 void IMU_Orientation::Quaternion::normalize()
 {
-    double norm = sqrt(w * w + x * x + y * y + z * z);
+    float norm = sqrtf(w * w + x * x + y * y + z * z);
     if (norm == 0)
-      norm = 0.0000001;
-    double inv_norm = 1.0 / norm;
+      norm = 0.0000001f;
+    float inv_norm = 1.0f / norm;
     w *= inv_norm;
     x *= inv_norm;
     y *= inv_norm;
