@@ -19,23 +19,26 @@
 #ifndef IMU_ORIENTATION_H
 #define IMU_ORIENTATION_H
 
+// Add our own type
+#ifdef SENSOR_FUSION_FLOATS
+    typedef sfFloat sfFloat;
+#else
+    typedef double sfFloat;
+#endif
+
 // Add definitions of M_PI just in case
-// Define float versions of M_PI and M_PI_2
+// Define sfFloat versions of M_PI and M_PI_2
 
 #ifdef M_PI
-    #define M_PIF        float(M_PI)
+    #define M_PIF        sfFloat(M_PI)
 #else
-    #define M_PIF        3.14159265358979323846f
+    #define M_PIF        sfFloat(3.14159265358979323846)
 #endif
 #ifdef M_PI_2
-    #define M_PI_2F      float(M_PI_2)
+    #define M_PI_2F      sfFloat(M_PI_2)
 #else
-    #define M_PI_2F      1.57079632679489661923f
+    #define M_PI_2F      sfFloat(1.57079632679489661923f)
 #endif
-
-
-
-
 
 class IMU_Orientation {
   public:
@@ -47,7 +50,7 @@ class IMU_Orientation {
     {
     public:
         Quaternion(): w(1), x(0), y(0), z(0) {}
-        Quaternion(float w, float x, float y, float z): w(w), x(x), y(y), z(z) {}
+        Quaternion(sfFloat w, sfFloat x, sfFloat y, sfFloat z): w(w), x(x), y(y), z(z) {}
         Quaternion(const Quaternion&) = default;
         Quaternion& operator= (const Quaternion&) = default;
 
@@ -57,38 +60,38 @@ class IMU_Orientation {
 
         Quaternion inverse();
         Quaternion conjugate();
-        float dotProduct(Quaternion &q);
-        Quaternion slerp(Quaternion &q, float weight);
+        sfFloat dotProduct(Quaternion &q);
+        Quaternion slerp(Quaternion &q, sfFloat weight);
         void normalize();
         void minimizeDistance(Quaternion &q);
 
         // Quaternion members
-        float  w;
-        float  x;
-        float  y;
-        float  z;
+        sfFloat  w;
+        sfFloat  x;
+        sfFloat  y;
+        sfFloat  z;
     private:
     };
 
     typedef struct Euler
     {
         union {
-            float tilt;
-            float pitch;
+            sfFloat tilt;
+            sfFloat pitch;
         };
-        float roll;
+        sfFloat roll;
         union {
-            float azimuth;
-            float heading;
+            sfFloat azimuth;
+            sfFloat heading;
         };
     } Euler;
 
-    void setAccelerometerValues(float x, float y, float z);
-    void setMagnetometerValues(float x, float y, float z);
-    void setGyroscopeDegreeValues(float x, float y, float z, float period);
-    void setGyroscopeRadianValues(float x, float y, float z, float period);
+    void setAccelerometerValues(sfFloat x, sfFloat y, sfFloat z);
+    void setMagnetometerValues(sfFloat x, sfFloat y, sfFloat z);
+    void setGyroscopeDegreeValues(sfFloat x, sfFloat y, sfFloat z, sfFloat period);
+    void setGyroscopeRadianValues(sfFloat x, sfFloat y, sfFloat z, sfFloat period);
 
-    void update(float weight = 0.01f);
+    void update(sfFloat weight = 0.01);
 
     Quaternion quaternion;
     Euler euler;
@@ -96,10 +99,10 @@ class IMU_Orientation {
   private:
     typedef struct Cartesian
     {
-      float x;
-      float y;
-      float z;
-      float magnitude;
+      sfFloat x;
+      sfFloat y;
+      sfFloat z;
+      sfFloat magnitude;
     } Cartesian;
 
     Cartesian accel;
