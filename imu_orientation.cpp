@@ -22,6 +22,10 @@
 #define DEGREE_TO_RAD sfFloat(M_PIF / 180.)
 #define GYRO_BIAS_COEFF sfFloat(0.99999)
 
+#ifdef SENSOR_FUSION_FLOATS
+using namespace std;
+#endif
+
 void IMU_Orientation::setAccelerometerValues(sfFloat x, sfFloat y, sfFloat z)
 {
     accel.x = sfFloat(x);
@@ -65,7 +69,7 @@ void IMU_Orientation::update(sfFloat weight)
     /**********************/
 
     // build quaternions from polar representation of accelerometer data
-    accel.magnitude = sqrt(pow(accel.z, 2) + pow(accel.y, 2));
+    accel.magnitude = sqrt(pow(accel.z, sfFloat(2)) + pow(accel.y, sfFloat(2)));
 
     sfFloat half_roll = atan2(accel.z, accel.y) * sfFloat(0.5);
     Quaternion q_accel_roll(cos(half_roll), 0, sin(half_roll), 0);
@@ -73,7 +77,7 @@ void IMU_Orientation::update(sfFloat weight)
     sfFloat half_tilt = atan2(accel.x, accel.magnitude) * sfFloat(0.5);
     Quaternion q_accel_tilt(cos(half_tilt), sin(half_tilt), 0, 0);
 
-    accel.magnitude = sqrt(pow(accel.x, 2) + pow(accel.magnitude, 2));
+    accel.magnitude = sqrt(pow(accel.x, sfFloat(2)) + pow(accel.magnitude, sfFloat(2)));
 
     Quaternion q_accel = q_accel_tilt * q_accel_roll;
 
@@ -147,7 +151,7 @@ void IMU_Orientation::update(sfFloat weight)
     half_roll = atan2(mag.z, mag.y) * sfFloat(0.5);
     Quaternion q_mag_roll(cos(half_roll), 0, sin(half_roll), 0);
 
-    mag.magnitude = sqrt(pow(mag.z, 2) + pow(mag.y, 2));
+    mag.magnitude = sqrt(pow(mag.z, sfFloat(2)) + pow(mag.y, sfFloat(2)));
     half_tilt = atan2(mag.x, mag.magnitude) * sfFloat(0.5);
     
     Quaternion q_mag_tilt(cos(half_tilt), sin(half_tilt), 0, 0);

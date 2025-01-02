@@ -21,7 +21,7 @@
 
 // Add our own type
 #ifdef SENSOR_FUSION_FLOATS
-    typedef sfFloat sfFloat;
+    typedef float sfFloat;
 #else
     typedef double sfFloat;
 #endif
