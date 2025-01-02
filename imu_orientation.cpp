@@ -42,9 +42,9 @@ void IMU_Orientation::setGyroscopeDegreeValues(sfFloat x, sfFloat y, sfFloat z, 
 {
     // convert to delta radians before storing
     // x and y axes need to be inverted
-    gyro.x = x * DEGREE_TO_RAD * period_sec;
-    gyro.y = y * -DEGREE_TO_RAD * period_sec;
-    gyro.z = z * -DEGREE_TO_RAD * period_sec;
+    gyro.x = sfFloat(x) * DEGREE_TO_RAD * sfFloat(period_sec);
+    gyro.y = sfFloat(y) * -DEGREE_TO_RAD * sfFloat(period_sec);
+    gyro.z = sfFloat(z) * -DEGREE_TO_RAD * sfFloat(period_sec);
 }
 
 void IMU_Orientation::setMagnetometerValues(sfFloat x, sfFloat y, sfFloat z)
