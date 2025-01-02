@@ -19,7 +19,7 @@
 #include "imu_orientation.h"
 #include <cmath>
 
-#define DEGREE_TO_RAD sfFloat(M_PIF / 180.)
+#define DEGREE_TO_RAD sfFloat(M_PIF / sfFloat(180.))
 #define GYRO_BIAS_COEFF sfFloat(0.99999)
 
 #ifdef SENSOR_FUSION_FLOATS
