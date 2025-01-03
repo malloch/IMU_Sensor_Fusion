@@ -49,3 +49,14 @@ int main(int argc, char** argv)
     return 0;
 }
 ~~~
+
+## Compile Parameters
+
+By default the algorithm uses doubles for all the calculations. If you wish to use floats, define ``SENSOR_FUSION_FLOATS`` before including library header file. See example below.
+
+~~~ C++
+#define SENSOR_FUSION_FLOATS
+#include "imu_orientation.h"
+~~~
+
+For platformio you can add ``-DSENSOR_FUSION_FLOATS`` as a build flag in your platformio.ini file.
