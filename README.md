@@ -4,6 +4,14 @@ Complementary-filter sensor fusion code for combining accelerometer, magnetomete
 
 This code is currently adapted for the LSM9DS1 IMU but should be trivial to adapt to other sensors.
 
+## Axis Orientation
+
+![IMU Axis orientation](images/lsm9ds1_axes.png)
+
+*Source: https://learn.sparkfun.com/tutorials/lsm9ds1-breakout-hookup-guide*
+
+*Note: Pay attentation to the IC's polarity-marking dot (the magnetometer axis are rotated).*
+
 ## Usage example
 
 ~~~ C++
