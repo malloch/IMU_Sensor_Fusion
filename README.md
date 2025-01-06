@@ -2,7 +2,7 @@
 
 Complementary-filter sensor fusion code for combining accelerometer, magnetometer, and rate-gyroscope data into a single stable estimate of orientation.
 
-This code is currently adapted for the LSM9DS1 IMU but should be trivial to adapt to other sensors.
+This code is currently adapted for the LSM9DS1 IMU but should be trivial to adapt to other sensors. 
 
 ## Axis Orientation
 
@@ -11,6 +11,12 @@ This code is currently adapted for the LSM9DS1 IMU but should be trivial to adap
 *Source: https://learn.sparkfun.com/tutorials/lsm9ds1-breakout-hookup-guide*
 
 *Note: Pay attentation to the IC's polarity-marking dot (the magnetometer axis are rotated).*
+
+## Typical Units
+
+- Accelerometer: __gs__
+- Gyroscope: __radians__
+- Magnetometer: __gauss/uTesla__
 
 ## Usage example
 
