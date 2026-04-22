@@ -42,7 +42,16 @@
 
 class IMU_Orientation {
   public:
-    IMU_Orientation(): quaternion(1,0,0,0) {}
+    IMU_Orientation(): quaternion(1,0,0,0){}
+    {
+        accel.x = accel.y = accel.z = accel.magnitude = sfFloat(0);
+        gyro.x = gyro.y = gyro.z = gyro.magnitude = sfFloat(0);
+        gyro_bias.x = gyro_bias.y = gyro_bias.z = gyro_bias.magnitude = sfFloat(0);
+        mag.x = mag.y = mag.z = mag.magnitude = sfFloat(0);
+        euler.tilt = sfFloat(0);
+        euler.roll = sfFloat(0);
+        euler.azimuth = sfFloat(0);
+    }
     ~IMU_Orientation() {}
   
     // Data structures
