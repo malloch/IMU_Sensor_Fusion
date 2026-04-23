@@ -18,9 +18,9 @@ void benchmarkSensorFusion(int num_loops) {
   start = micros();
   while (count--) {
       sensor_fusion.setAccelerometerValues(0, 1, 0);
-      sensor_fusion.setGyroscopeRadianValues(0, 0, 0, 0.001);
+      sensor_fusion.setGyrometerRadianValues(0, 0, 0);
       sensor_fusion.setMagnetometerValues(0, 1, 2);
-      sensor_fusion.update();
+      sensor_fusion.update(0.001);
   }
   end = micros();
   elapsed_time = end-start;
