@@ -1,6 +1,6 @@
 # IMU Sensor Fusion
 
-Complementary-filter sensor fusion code for combining accelerometer, magnetometer, and rate-gyroscope data into a single stable estimate of orientation.
+Complementary-filter sensor fusion code for combining accelerometer, magnetometer, and rate-gyroscope/gyrometer data into a single stable estimate of orientation.
 
 This code is currently adapted for the LSM9DS1 IMU but should be trivial to adapt to other sensors. 
 
@@ -15,8 +15,9 @@ This code is currently adapted for the LSM9DS1 IMU but should be trivial to adap
 ## Typical Units
 
 - Accelerometer: __gs__
-- Gyroscope: __radians__
+- Gyrometer: __radians__
 - Magnetometer: __gauss/uTesla__
+- Time: __seconds__
 
 ## Usage example
 
@@ -40,10 +41,10 @@ int main(int argc, char** argv)
         then = now;
 
         imu.setAccelerometerValues(0, 1, 0);
-        imu.setGyroscopeRadianValues(0, 0, 0, elapsed.count());
+        imu.setGyrometerRadianValues(0, 0, 0);
         imu.setMagnetometerValues(0, 1, 2);
 
-        imu.update();
+        imu.update(elapsed.count());
 
         // print the estimated quaternion
         std::cout << "Quaternion: "
