@@ -274,7 +274,7 @@ void IMU_Orientation::update(sfFloat period, sfFloat weight) {
     Quaternion delayed = Q;
     // quaternion = quaternion.slerp(q_accel_mag, sfFloat(weight));
     // quaternion = quaternion.slerp(q_accel, sfFloat(weight));
-    Q = Q.slerp(q_accel_mag, 0.001);
+    Q = Q.slerp(q_accel_mag, weight);
 
     // use the shortest distance from previous orientation
     Q.minimizeDistance(delayed);

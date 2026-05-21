@@ -396,7 +396,7 @@ class IMU_Orientation {
     inline void setGyrometerRadianValues(sfFloat *values)
         { setGyrometerRadianValues(values[0], values[1], values[2]); }
 
-    void update(sfFloat period, sfFloat weight = 0.01);
+    void update(sfFloat period, sfFloat weight = 0.001);
 
     void reset();
 
