@@ -87,8 +87,8 @@ void IMU_Orientation::update(sfFloat weight)
 
     // continuously adjust for changing gyro bias
     gyro_bias.x = gyro_bias.x * GYRO_BIAS_COEFF + gyro.x * (sfFloat(1.0) - GYRO_BIAS_COEFF);
-    gyro_bias.y = gyro_bias.y * GYRO_BIAS_COEFF + gyro.x * (sfFloat(1.0) - GYRO_BIAS_COEFF);
-    gyro_bias.z = gyro_bias.z * GYRO_BIAS_COEFF + gyro.x * (sfFloat(1.0) - GYRO_BIAS_COEFF);
+    gyro_bias.y = gyro_bias.y * GYRO_BIAS_COEFF + gyro.y * (sfFloat(1.0) - GYRO_BIAS_COEFF);
+    gyro_bias.z = gyro_bias.z * GYRO_BIAS_COEFF + gyro.z * (sfFloat(1.0) - GYRO_BIAS_COEFF);
 
     gyro.x -= gyro_bias.x;
     gyro.y -= gyro_bias.y;
