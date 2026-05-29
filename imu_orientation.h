@@ -328,15 +328,15 @@ class Leaky_Cartesian : public Cartesian {
         input += rhs;
         // we don't want raw integrated value to get too large and lose FP precision
         for (int i = 0; i < 3; i++) {
-            if (elements[0] > 1000) {
-                elements[0] -= 1000;
-                ff_samps[0].elements[0] -= 1000;
-                ff_samps[1].elements[0] -= 1000;
+            while (input.elements[i] > 1024) {
+                input.elements[i] -= 1024;
+                ff_samps[0].elements[i] -= 1024;
+                ff_samps[1].elements[i] -= 1024;
             }
-            else if (elements[0] < -1000) {
-                elements[0] += 1000;
-                ff_samps[0].elements[0] += 1000;
-                ff_samps[1].elements[0] += 1000;
+            while (input.elements[i] < -1024) {
+                input.elements[i] += 1024;
+                ff_samps[0].elements[i] += 1024;
+                ff_samps[1].elements[i] += 1024;
             }
         }
         Cartesian::operator=(  input       * gain
